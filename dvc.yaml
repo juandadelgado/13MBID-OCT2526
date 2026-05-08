@@ -9,3 +9,5 @@ stages:
       - docs/figures/target_distribution.png
       - docs/figures/correlation_heatmap_tarjetas.png
       - docs/figures/correlation_heatmap_creditos.png
+      - docs/figures/ingresos_por_objetivo.png
+      - docs/figures/edad_vs_importe.png

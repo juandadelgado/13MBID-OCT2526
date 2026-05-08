@@ -56,6 +56,27 @@ def visualize_data(datos_creditos: str = "data/raw/datos_creditos.csv",
     plt.savefig(output_dir / 'correlation_heatmap_creditos.png')
     plt.close()
 
+################################################################################
+# TODO: Agregar al menos dos gráficos adicionales que consideren variables.
+# OPCIÓN EXTRA (ejemplo): agregar la generación del reporte con ydata-profiling.
+################################################################################
+
+   # Distribución de ingresos según el bbjetivo del crédito
+    plt.figure(figsize=(12, 6))
+    sns.boxplot(x='objetivo_credito', y='ingresos', data=df_creditos)
+    plt.yscale('log') # Usamos escala logarítmica porque los ingresos suelen variar mucho
+    plt.title('Distribución de ingresos por objetivo del crédito')
+    plt.xticks(rotation=45)
+    plt.savefig(output_dir / 'ingresos_por_objetivo.png')
+    plt.close()
+
+    # Relación entre Edad e Importe Solicitado
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(x='edad', y='importe_solicitado', hue='falta_pago', data=df_creditos, alpha=0.6)
+    plt.title('Relación edad vs importe solicitado')
+    plt.savefig(output_dir / 'edad_vs_importe.png')
+    plt.close()
+
 if __name__ == "__main__":
     visualize_data()
 
