@@ -11,3 +11,21 @@ stages:
       - docs/figures/correlation_heatmap_creditos.png
       - docs/figures/ingresos_por_objetivo.png
       - docs/figures/edad_vs_importe.png
+
+  test_pandera:
+    cmd: pytest --html=docs/report_basico.html --self-contained-html test/test_data_quality.py -v || cd .
+    deps:
+      - data/raw/datos_creditos.csv
+      - data/raw/datos_tarjetas.csv
+      - test/test_data_quality.py
+    outs:
+      - docs/report_basico.html
+
+  test_ge:
+    cmd: pytest --html=docs/report_ge.html --self-contained-html test/test_data_quality_ge.py -v || cd .
+    deps:
+      - data/raw/datos_creditos.csv
+      - data/raw/datos_tarjetas.csv
+      - test/test_data_quality_ge.py
+    outs:
+      - docs/report_ge.html

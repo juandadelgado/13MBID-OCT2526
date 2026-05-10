@@ -1,0 +1,80 @@
+schema: '2.0'
+stages:
+  data_visualization:
+    cmd: python src/data_visualization.py
+    deps:
+    - path: data/raw/datos_creditos.csv
+      hash: md5
+      md5: 3b26edd22e8827f890d7cd32efe475b7
+      size: 663047
+    - path: data/raw/datos_tarjetas.csv
+      hash: md5
+      md5: 9e197c893925601cd447c81256e8cf07
+      size: 845190
+    - path: src/data_visualization.py
+      hash: md5
+      md5: 3e1cd6cef2e562eb3d84af0340322416
+      size: 3429
+    outs:
+    - path: docs/figures/correlation_heatmap_creditos.png
+      hash: md5
+      md5: c261236f9486b6c3017ade2cf97cd0e3
+      size: 77088
+    - path: docs/figures/correlation_heatmap_tarjetas.png
+      hash: md5
+      md5: a58da1be7b3a1ed4b2d928ca90923e65
+      size: 52584
+    - path: docs/figures/edad_vs_importe.png
+      hash: md5
+      md5: 6fb3acf88ff5b10662ebf115b7b7c169
+      size: 64416
+    - path: docs/figures/ingresos_por_objetivo.png
+      hash: md5
+      md5: a2ddeb7cf9faf9a62e3c989be1578e42
+      size: 38128
+    - path: docs/figures/target_distribution.png
+      hash: md5
+      md5: 86bbb22f46fc7bee5a70fb389e863120
+      size: 21470
+  test_pandera:
+    cmd: pytest --html=docs/report_basico.html --self-contained-html test/test_data_quality.py
+      -v || cd .
+    deps:
+    - path: data/raw/datos_creditos.csv
+      hash: md5
+      md5: 3b26edd22e8827f890d7cd32efe475b7
+      size: 663047
+    - path: data/raw/datos_tarjetas.csv
+      hash: md5
+      md5: 9e197c893925601cd447c81256e8cf07
+      size: 845190
+    - path: test/test_data_quality.py
+      hash: md5
+      md5: 305c4fceb96be4ef4e6dd4372934f415
+      size: 6709
+    outs:
+    - path: docs/report_basico.html
+      hash: md5
+      md5: b6b9460b77bff7ea9d60f3220fbe0e03
+      size: 46676
+  test_ge:
+    cmd: pytest --html=docs/report_ge.html --self-contained-html test/test_data_quality_ge.py
+      -v || cd .
+    deps:
+    - path: data/raw/datos_creditos.csv
+      hash: md5
+      md5: 3b26edd22e8827f890d7cd32efe475b7
+      size: 663047
+    - path: data/raw/datos_tarjetas.csv
+      hash: md5
+      md5: 9e197c893925601cd447c81256e8cf07
+      size: 845190
+    - path: test/test_data_quality_ge.py
+      hash: md5
+      md5: 431c544b9c48c657860355f85b0688cf
+      size: 3257
+    outs:
+    - path: docs/report_ge.html
+      hash: md5
+      md5: d81aecc96ef834ddbdcef22ea6b6b6a1
+      size: 33327
