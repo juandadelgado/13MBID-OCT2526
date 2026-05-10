@@ -71,10 +71,30 @@ stages:
       size: 845190
     - path: test/test_data_quality_ge.py
       hash: md5
-      md5: 431c544b9c48c657860355f85b0688cf
-      size: 3257
+      md5: 9c6a37f7da1e4a6c2aaacfdc6bf0f9a0
+      size: 5301
     outs:
     - path: docs/report_ge.html
       hash: md5
-      md5: d81aecc96ef834ddbdcef22ea6b6b6a1
-      size: 33327
+      md5: 78259cdcbb9a57f13a7aed58a2da0dec
+      size: 41189
+  data_processing:
+    cmd: python src/data_prep.py
+    deps:
+    - path: data/raw/datos_creditos.csv
+      hash: md5
+      md5: 3b26edd22e8827f890d7cd32efe475b7
+      size: 663047
+    - path: data/raw/datos_tarjetas.csv
+      hash: md5
+      md5: 9e197c893925601cd447c81256e8cf07
+      size: 845190
+    - path: src/data_prep.py
+      hash: md5
+      md5: fcc4f029dff584d76791b739ef532913
+      size: 4575
+    outs:
+    - path: data/processed/datos_integrados.csv
+      hash: md5
+      md5: 03f4fe9ca8d8bbb3c4c84bc70cf68b9e
+      size: 2054657
