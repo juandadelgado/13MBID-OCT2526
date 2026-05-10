@@ -48,32 +48,67 @@ def test_great_expectations():
                 "success": False,
                 "message": message
             })
-    #Atributo a analizar: Exactitud (rangos de valores en datos)
+    # Validación 1: Rango de edad (18 a 100 años)
+    edad_valida = df_creditos["edad"].between(18, 100).all()
+    mensaje_edad = ""
+    if not edad_valida:
+        edades_fuera = df_creditos[(df_creditos["edad"] < 18) | (df_creditos["edad"] > 100)]["edad"].unique()
+        mensaje_edad = f"Existen edades fuera del rango encontradas: {sorted(edades_fuera)}"
     add_expectation(
         "rango_edad", #Verificar que la edad de los clientes esté entre 18 y 100 años
-        df_creditos["edad"].between(18, 100).all(), #La validación a realizar
-        "La edad debe estar entre 18 y 100 años." #Mensaje de error en caso de que la validación falle
+        edad_valida, #La validación a realizar
+        f"La edad debe estar entre 18 y 100 años. {mensaje_edad}"
     )
+
+    # Validación 2: Situación de vivienda (ALQUILER, PROPIA, HIPOTECA, OTROS)
+    vivienda_valida = df_creditos["situacion_vivienda"].isin(["ALQUILER", "PROPIA", "HIPOTECA", "OTROS"]).all()
+    mensaje_vivienda = ""
+    if not vivienda_valida:
+        viviendas_fuera = df_creditos[~df_creditos["situacion_vivienda"].isin(["ALQUILER", "PROPIA", "HIPOTECA", "OTROS"])]["situacion_vivienda"].unique()
+        mensaje_vivienda = f"Existen situaciones de vivienda fuera del rango encontradas: {sorted(viviendas_fuera)}"
     add_expectation(
         "situacion_vivienda", #Verificar que la situación de vivienda sea una de las categorías válidas
-        df_creditos["situacion_vivienda"].isin(["ALQUILER", "PROPIA", "HIPOTECA", "OTROS"]).all(),
-        "La situación de vivienda no se encuentra en el rango válido."
+        vivienda_valida,
+        f"La situación de vivienda no se encuentra en el rango válido. {mensaje_vivienda}"
     )
-    ############# Validaciones para el dataset de Tarjetas #############
 
-    # Atributo: Exactitud (Rango de valores para límite de crédito)
-    # Validamos que el límite de crédito esté en un rango lógico (ej. 0 a 100,000)
+# Validación 3: Límite de crédito (0 a 100,000)
+    limite_valido = df_tarjetas["limite_credito_tc"].between(0, 100000).all()
+    mensaje_limite = ""
+    if not limite_valido:
+        limites_fuera = df_tarjetas[(df_tarjetas["limite_credito_tc"] < 0) | (df_tarjetas["limite_credito_tc"] > 100000)]["limite_credito_tc"].unique()
+        mensaje_limite = f"Límites de crédito fuera de rango encontrados: {sorted(limites_fuera)}"
     add_expectation(
         "limite_credito_rango", 
-        df_tarjetas["limite_credito_tc"].between(0, 100000).all(), 
-        "El límite de crédito debe estar entre 0 y 100,000."
+        limite_valido, 
+        f"El límite de crédito debe estar entre 0 y 100,000. {mensaje_limite}"
     )
 
-    # Atributo: Consistencia/Exactitud (Categorías de nivel educativo)
-    # Ajustamos las categorías típicas que suelen venir en estos datasets
-    niveles_validos = ["UNIVERSITARIO_COMPLETO", "SECUNDARIO_COMPLETO", "DESCONOCIDO", "UNIVERSITARIO_INCOMPLETO", "POSTGRADO_COMPLETO", "DOCTORADO"]
+    # Validación 4: Nivel educativo (Categorías específicas)
+    niveles_validos = ["UNIVERSITARIO_COMPLETO", "SECUNDARIO_COMPLETO", "DESCONOCIDO", "UNIVERSITARIO_INCOMPLETO", "POSGRADO_COMPLETO", "POSGRADO_INCOMPLETO", "DOCTORADO"]
+    educacion_valida = df_tarjetas["nivel_educativo"].isin(niveles_validos).all()
+    mensaje_educacion = ""
+    if not educacion_valida:
+        educacion_fuera = df_tarjetas[~df_tarjetas["nivel_educativo"].isin(niveles_validos)]["nivel_educativo"].unique()
+        mensaje_educacion = f"Niveles educativos no reconocidos encontrados: {sorted(educacion_fuera)}"
     add_expectation(
         "nivel_educativo_valido",
-        df_tarjetas["nivel_educativo"].isin(niveles_validos).all(),
-        f"Existen niveles educativos fuera de las categorías permitidas: {niveles_validos}"
+        educacion_valida,
+        f"Existen niveles educativos fuera de las categorías permitidas. {mensaje_educacion}"
     )
+
+    # Resumen y validación final
+    print("n" + "+"*70)
+    print("RESUMEN DE VALIDACIONES")
+    print("+"*70)
+    for exp in results["expectations"]:
+        status = "✅" if exp["success"] else "❌"
+        print(f"{status} {exp['expectation']}")
+        if not exp["success"] and "message" in exp:
+            print(f"   Detalles: {exp['message']}")
+    print(f"\nTotal: {results['statistics']['success_count']}/{results['statistics']['total_count']}, Éxitos: {results['statistics']['success_count']}, Fallos: {results['statistics']['total_count'] - results['statistics']['success_count']}")
+    print("="*70 + "\n")
+
+    # El test falla si alguna validación no se cumple
+    assert results["success"], f"Se encontraron {results['statistics']['total_count'] - results['statistics']['success_count']} validaciones fallidas. Revisa el resumen para más detalles."
+    
