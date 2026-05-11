@@ -114,11 +114,16 @@ def predict(request: PredictionRequest):
         probability = model.predict_proba(input_data)[0]
 
         # Mapear las etiquetas de clase a descripciones legibles
-        class_labels = model.predict(input_data)[0]
-        probability_dict = {class_labels[i]: float(probability[i]) for i in range(len(class_labels))}
+        class_labels = model.named_steps['model'].classes_
+        probability_dict = {
+            # El dict de probabilidades se construye dinámicamente para que se adapte a cualquier número de clases
+            # CAMBIO: no estaba hecha la conversión a str y ese era el error en SP6
+            str(class_labels[i]): float(probability[i]) for i in range(len(class_labels)) 
+        }
+
         model_info = {
             "model_version": "1.0.0",
-            "model_type": "Logistic Regression",    
+            "model_type": type(model.named_steps["model"]).__name__, #Para que el nombre se complete automáticamente según el modelo
         }
 
         return PredictionResponse(
@@ -132,3 +137,11 @@ def predict(request: PredictionRequest):
         )
     except Exception as e: 
         raise HTTPException(status_code=503, detail=f"Error al realizar la predicción: {e}")
+
+
+        # Mapear las etiquetas de clase a descripciones legibles
+        # class_labels = model.predict(input_data)[0]
+        # probability_dict = {class_labels[i]: float(probability[i]) for i in range(len(class_labels))}
+        # model_info = {
+        #    "model_version": "1.0.0",
+        #    "model_type": "Logistic Regression",  
