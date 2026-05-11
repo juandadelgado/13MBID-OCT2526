@@ -31,9 +31,9 @@ class PredictionRequest(BaseModel):
     capacidad_pago: float = Field(..., description="Capacidad de pago")
     operaciones_mensuales: float = Field(..., description="Operaciones mensuales")
     presion_financiera: float = Field(..., description="Presión financiera")
-    ops_mensuales_tc: float = Field(..., description="Operaciones mensuales")
-    estabilidad_laboral: float = Field(..., description="Estabilidad laboral")
-    gasto_promedio_op: float = Field(..., description="Media de gasto")
+    #ops_mensuales_tc: float = Field(..., description="Operaciones mensuales")
+    #estabilidad_laboral: float = Field(..., description="Estabilidad laboral")
+    #gasto_promedio_op: float = Field(..., description="Media de gasto")
 
     class Config:
         json_schema_extra = {
@@ -106,8 +106,15 @@ def predict(request: PredictionRequest):
         raise HTTPException(status_code=500, detail="El modeo no está disponible. Intenta nuevamente.")
     
     try:
+
+        data_dict = request.model_dump()
+        data_dict['ops_mensuales_tc'] = float(data_dict['operaciones_mensuales'])
+        data_dict['estabilidad_laboral'] = float(data_dict['antiguedad_empleado'] / data_dict['edad']) if data_dict['edad'] > 0 else 0.0
+        data_dict['gasto_promedio_op'] = float(data_dict['gastos_ult_12m'] / (data_dict['operaciones_mensuales'] + 1))
+
         #Convertir la solicitud a un DataFrame
-        input_data = pd.DataFrame([request.model_dump()])
+        input_data = pd.DataFrame([data_dict])
+        #input_data = pd.DataFrame([request.model_dump()])
 
         # Realizar la predicción
         prediction = model.predict(input_data)[0]
